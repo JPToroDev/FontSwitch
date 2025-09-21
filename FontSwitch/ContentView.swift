@@ -1,24 +1,33 @@
 //
-//  ContentView.swift
-//  FontSwitch
+// ContentView.swift
+// FontSwitch
+// https://github.com/JPToroDev/FontSwitch
+// See LICENSE for license information.
+// © 2024 J.P. Toro
 //
-//  Created by Joshua Toro on 9/21/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(PermissionManager.self) private var permissionManager
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if permissionManager.hasAccessibilityAccess {
+                FontPicker()
+            } else {
+                NoAccessView()
+            }
         }
-        .padding()
+        .frame(width: 200)
+        .frame(minHeight: 250, maxHeight: 500)
+        .clipShape(.rect(cornerRadius: 25, style: .continuous))
+        .task { await permissionManager.checkAccessibilityAccess() }
     }
 }
 
 #Preview {
     ContentView()
+        .environment(PermissionManager())
+        .environment(UpdateManager())
+        .environment(TypefaceManager())
 }
